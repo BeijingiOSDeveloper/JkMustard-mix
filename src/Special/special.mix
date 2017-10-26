@@ -1,0 +1,48 @@
+<style>
+  .container{
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+  }
+  .nav{
+    width: 100%;
+    height: 60px;
+    background-color: #00A000;
+  }
+  .tab{
+    flex: 1;
+  }
+</style>
+
+<import name="special-tab-content" src="../Common/template/special_tab_content.mix"></import>
+
+<template>
+  <div class="container">
+    <div class="nav">
+      <text onclick="backToMain">返回</text>
+    </div>
+    <div class="tab">
+      <tabs index="{{index}}">
+        <tab-content>
+          <special-tab-content data_name="scenery_data" data_add_name="scenery_data_add" data_detail="SceneryDetail" data="{{data}}">
+          </special-tab-content>
+        </tab-content>
+      </tabs>
+    </div>
+  </div>
+</template>
+
+<script>
+  import special_data from "../Common/js/special_data"
+  import router from '@system.router'
+  export default {
+    data: {
+      data: special_data.data
+    },
+    backToMain:function () {
+      router.replace({
+        uri: 'Main'
+      })
+    }
+  }
+</script>

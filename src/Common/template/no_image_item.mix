@@ -1,0 +1,99 @@
+<style>
+    .item{
+        padding: 0 20px;
+        display: flex;
+        height: 164px;
+        flex-direction: column;
+        background-color: #f5f5f5;
+    }
+    .item_content{
+        flex: 1;
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+    }
+    .item_line{
+        width: 100%;
+        height: 2px;
+        background-color: #dedede;
+    }
+
+    .item_title{
+        font-size: 32px;
+        padding-top: 34px;
+        color: #080808;
+    }
+    .empty{
+        flex: 1;
+    }
+
+    .item_tag{
+        padding-bottom: 40px;
+    }
+    .item_status_div{
+        height: 24px;
+        border:1px solid #FF0000;
+        border-radius: 5px;
+        margin-right: 25px;
+    }
+    .item_from_div{
+        height: 24px;
+    }
+    .item_time_div{
+        height: 24px;
+    }
+    .item_status_text{
+        font-size: 17px;
+        color: #ff0000;
+        margin: 3px 5px;
+    }
+    .item_from{
+        font-size: 22px;
+        margin-right: 25px;
+    }
+    .item_time{
+        font-size: 22px;
+    }
+</style>
+
+<template>
+    <div class="item" onclick="pushToDetail(article_data.mUrl)">
+        <div class="item_content">
+            <text class="item_title" lines="1">{{article_data.title}}</text>
+            <div class="empty"></div>
+            <div class="item_tag">
+                <div class="item_status_div">
+                    <text class="item_status_text">{{article_data.sourceType}}</text>
+                </div>
+                <div class="item_from_div">
+                    <text class="item_from">{{article_data.fromWhere}}</text>
+                </div>
+                <div class="item_time_div">
+                    <text class="item_time">{{displayTime}}</text>
+                </div>
+            </div>
+        </div>
+        <div class="item_line"></div>
+    </div>
+
+</template>
+
+<script>
+    import webview from '@system.webview'
+    export default {
+        props: ["article_data"],
+        data: {
+            "article_data":"",
+            "displayTime":""
+        },
+        onInit:function () {
+            var Time = this.article_data.displayTime;
+            this.displayTime = Time.substring(5,16);
+        },
+        pushToDetail: function(mUrl){
+            webview.loadUrl({
+                url: mUrl+"?ldfrom=1"
+            });
+        }
+    }
+</script>

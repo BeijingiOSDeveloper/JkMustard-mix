@@ -1,0 +1,87 @@
+<style>
+  .refresh{
+    flex-direction: column;
+    flex: 1;
+  }
+  .list_container{
+    flex-direction: column;
+    flex: 1;
+  }
+  .list_item{
+    flex-direction: column;
+  }
+  .swiper{
+    height: 250px;
+  }
+  .img{
+    height: 250px;
+    flex: 1;
+  }
+  .load_more{
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+  }
+</style>
+<import name="special-item-module" src="./special_item_module.mix"></import>
+
+<template>
+  <refresh class="refresh" offset="300" onrefresh="refresh" refreshing="{{is_refreshing}}">
+    <list class="list_container" onscrollbottom="refreshList">
+      <list-item class="list_item" type="header">
+        <swiper class="swiper" auto-play="false" interval="4000" indicator-size="20" if="{{data.swiper_list}}">
+          <block for="{{data.swiper_list}}">
+            <image src="{{$item.src}}" resize-mode="cover" class="img"></image>
+          </block>
+        </swiper>
+      </list-item>
+
+      //内容列表
+      <list-item class="list_container" for="{{data[data_name]}}" type="item_content">
+        <special-item-module render_data="{{$item}}" render_detail="{{data_detail}}" render_num="{{$idx}}">
+          <!-- 引入组件 -->
+        </special-item-module>
+      </list-item>
+
+      //加载更多
+      <list-item type="loadMore" class="load_more" if="{{load_more}}">
+        <progress type="circular"></progress>
+        <text>加载更多...</text>
+      </list-item>
+    </list>
+  </refresh>
+</template>
+
+<script>
+  import prompt from "@system.prompt"
+  export default {
+    props: ["data_name", "data_add_name", "data_detail", "data"],  //用props的方式接受父容器传递数据，此时的data_name已合并到了当前this对象中
+    data: {
+      index: 0,
+      load_more: true,
+      is_refreshing: false,
+      data_name: "",
+      data_add_name: "",
+      data_detail: "",
+      data: ""
+    },
+    refresh: function(e){
+      // 刷新
+      this.is_refreshing = e.refreshing; // 更新刷新状态
+      setTimeout(function(){ //模拟刷新操作
+        prompt.showToast({ message:'已经是最新了'});
+        this.is_refreshing = false;  //关闭刷新状态
+      }.bind(this),2000);
+    },
+    refreshList: function(index){
+      var that_ = this;
+      // 列表刷新
+      var dataName = that_.data_name;
+      var dataAddName = that_.data_add_name;
+      var listDate = that_.data[dataName];
+      var addDtate = that_.data[dataAddName];
+      // 模拟刷新操作
+      that_.data[dataName] = listDate.concat(addDtate);
+    },
+  }
+</script>

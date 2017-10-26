@@ -1,0 +1,48 @@
+{
+  "package": "com.chinabyte.mustard",
+  "name": "芥末头条",
+  "versionName": "1.0.8",
+  "versionCode": "8",
+  "icon": "/Common/img/icon.png",
+  "features": [
+    { "name": "system.network" },
+    { "name": "system.fetch" },
+    { "name": "system.webview" },
+    { "name": "system.prompt" }
+  ],
+  "permissions": [
+    { "origin": "*" }
+  ],
+  "config": {
+    "logLevel": "debug"
+  },
+  "router": {
+    "entry": "Special",
+    "pages": {
+      "Main": {
+        "component": "main",
+        "path": "/"
+      },
+      "Paging":{
+        "component": "paging",
+        "path": "/paging"
+      },
+      "Special":{
+        "component": "special",
+        "path": "/special"
+      }
+    }
+  },
+  "display": {
+    "backgroundColor": "#ffffff",
+    "titleBar": false,
+    "titleBarBackgroundColor": "#000000",
+    "titleBarTextColor": "#ffffff",
+    "pages": {
+      "Main": {
+        "titleBarText": "比特头条"
+      }
+    }
+  }
+
+}

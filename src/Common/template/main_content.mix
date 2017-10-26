@@ -1,0 +1,181 @@
+<style>
+    .refresh{
+        flex-direction: column;
+        flex: 1;
+    }
+    .list_container{
+        flex-direction: column;
+        flex: 1;
+    }
+    .list_item{
+        flex-direction: column;
+    }
+    .item_content{
+         flex: 1;
+         flex-direction: column;
+    }
+    .load_more{
+        justify-content: center;
+        align-items: center;
+        height: 100px;
+    }
+</style>
+
+<import name="no_image_item" src="./no_image_item.mix"></import>
+<import name="one_image_item" src="./one_image_item.mix"></import>
+<import name="three_image_item" src="./three_image_item.mix"></import>
+
+<template>
+    <refresh class="refresh" offset="200" onrefresh="refresh" refreshing="{{is_refreshing}}">
+        <list class="list_container" onscrollbottom="refreshList">
+            //内容列表
+            <list-item type="item_content" class="list_container">
+                <block for="{{fetch_data}}">
+                    <block if="{{$item.wapImageList.length==0}}">
+                        <no_image_item article_data="{{$item}}"></no_image_item>
+                    </block>
+                    <block if="{{$item.wapImageList.length==1}}">
+                        <one_image_item article_data="{{$item}}"></one_image_item>
+                    </block>
+                    <block if="{{$item.wapImageList.length==2}}">
+                        <one_image_item article_data="{{$item}}"></one_image_item>
+                    </block>
+                    <block if="{{$item.wapImageList.length==3}}">
+                        <three_image_item article_data="{{$item}}"></three_image_item>
+                    </block>
+                </block>
+            </list-item>
+
+            //加载更多
+            <list-item type="loadMore" class="load_more" if="{{load_more}}">
+                <progress type="circular"></progress>
+                <text>正在加载...</text>
+            </list-item>
+        </list>
+    </refresh>
+</template>
+
+<script>
+    import fetch from "@system.fetch"
+    import prompt from "@system.prompt"
+    export default {
+        props: ["classify"],
+        data: {
+             load_more: true,
+             is_refreshing: false,
+             fetch_data:[],
+             pageNo:1,
+             pageSize:10,
+             max:""
+        },
+        onInit: function(){
+            var that_ = this;
+            fetch.fetch({
+                url:"http://www.chinabyte.com/open/article/mi.do",
+                method:"POST",
+                data:{
+                    classify:that_.classify,
+                    pageNo:that_.pageNo,
+                    pageSize:that_.pageSize
+                },
+                header:{'Content-Type':'application/json'},
+                success:function(response){
+                    that_.pageNo = 2;
+                    let json = JSON.parse(response.data);
+                    if(json.code == "200"){
+                        that_.fetch_data= json.result.articleWapList;
+                        that_.max = Math.ceil(json.result.dataCount/10);
+                        if(json.result.dataCount < 5){
+                            that_.load_more = false;
+                        }
+                    }else{
+                        prompt.showToast({
+                            message:"请求失败"
+                        })
+                    }
+                },
+                fail:function(){
+                    prompt.showToast({
+                        message:"请求失败"
+                    })
+                }
+            })
+        },
+        refresh: function(e){
+            var that_ = this;
+            that_.is_refreshing = e.refreshing; // 更新刷新状态
+            that_.is_refreshing = "false";
+            fetch.fetch({
+                url:"http://www.chinabyte.com/open/article/mi.do",
+                method:"POST",
+                data:{
+                    classify:that_.classify,
+                    pageNo:1,
+                    pageSize:that_.pageSize
+                },
+                header:{'Content-Type':'application/json'},
+                success:function(response){
+                    that_.pageNo = 1;
+                    let json = JSON.parse(response.data);
+                    that_.is_refreshing = "false";
+                    if(json.code == "200"){
+                        that_.fetch_data= json.result.articleWapList;
+                        prompt.showToast({
+                            message:"刷新成功"
+                        });
+                    }else{
+                        prompt.showToast({
+                            message:"刷新失败"
+                        })
+                    }
+                },
+                fail:function(){
+                    that_.is_refreshing = "false";
+                    prompt.showToast({
+                        message:"请求失败"
+                    })
+                }
+            })
+        },
+        refreshList: function(index){
+            //上拉加载
+            var that_ = this;
+            var listDate = that_.fetch_data;
+            if(that_.max < that_.pageNo){
+                prompt.showToast({
+                    message:"暂无更多数据"
+                });
+                that_.load_more = false;
+            }else {
+                fetch.fetch({
+                    url:"http://www.chinabyte.com/open/article/mi.do",
+                    method:"POST",
+                    data:{
+                        classify:that_.classify,
+                        pageNo:that_.pageNo,
+                        pageSize:that_.pageSize
+                    },
+                    header:{'Content-Type':'application/json'},
+                    success:function(response){
+                        let json = JSON.parse(response.data);
+                        if(json.code == "200"){
+                            that_.pageNo = that_.pageNo + 1;
+                            var addDtate = json.result.articleWapList;
+                            that_.fetch_data = listDate.concat(addDtate);
+                        }else{
+                            prompt.showToast({
+                                message:"加载失败"
+                            })
+                        }
+                    },
+                    fail:function(){
+                        that_.is_refreshing = "false";
+                        prompt.showToast({
+                            message:"请求失败"
+                        })
+                    }
+                })
+            }
+        }
+    }
+</script>

@@ -1,0 +1,53 @@
+<style>
+  .content_item{
+    padding: 20px;
+    border-style: solid;
+    border-color: #ddd;
+    border-bottom-width: 2px;
+  }
+  .item_image{
+    height: 180px;
+    width: 220px;
+    margin-right: 20px;
+  }
+  .item_content{
+    flex: 1;
+    flex-direction: column;
+  }
+  .item_title{
+    font-size: 33px;
+    line-height: 43px;
+    color: #333;
+  }
+  .item_detail{
+    color: #a9a9a9;
+    font-size: 30px;
+  }
+</style>
+
+<template>
+  <div class="content_item" onclick="detail(render_data.title,render_detail)">
+    <image class="item_image" src="{{render_data.image_src}}"></image>
+    <div class="item_content">
+      <text class="item_title">{{render_data.title}}----{{render_num}}</text>
+      <text class="item_detail" lines="1">{{render_data.content_detail_1}}</text>
+      <text class="item_detail" lines="1">{{render_data.content_detail_2}}</text>
+      <text class="item_detail">{{render_data.content_detail_3}}</text>
+    </div>
+
+  </div>
+</template>
+
+<script>
+  export default {
+    props: ["render_data","render_detail","render_num"],  //用props的方式接受父容器传递数据，此时的render_data已合并到了当前this对象中
+    data: {
+      "render_data": [],
+      "render_detail": "",
+      "render_num": ""
+    },
+    detail: function(title,detailModule){
+      history.push({"name": detailModule,"params": {"titleBarText": title}});
+    },
+  }
+</script>
